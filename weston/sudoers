@@ -1,0 +1,32 @@
+# /etc/sudoers.d/waydroid
+neko ALL=NOPASSWD: /bin/systemctl restart waydroid-container.service
+neko ALL=NOPASSWD: /bin/systemctl start waydroid-container.service
+neko ALL=NOPASSWD: /bin/systemctl stop waydroid-container.service
+neko ALL=NOPASSWD: /bin/systemctl status waydroid-container.service
+neko ALL=NOPASSWD: /usr/bin/waydroid container unfreeze
+neko ALL=NOPASSWD: /usr/bin/waydroid container freeze
+neko ALL=NOPASSWD: /usr/bin/waydroid logcat
+neko ALL=NOPASSWD: /usr/bin/waydroid shell
+neko ALL=NOPASSWD: /usr/bin/waydroid shell logcat
+
+# mantis gamepad pro
+neko ALL=NOPASSWD: /usr/bin/waydroid shell sh /sdcard/Android/data/app.mantispro.gamepad/files/buddyNew.sh
+neko ALL=NOPASSWD: /home/user/.local/bin/reset_pad.sh
+
+# disable mantis keyboard by default
+neko ALL=NOPASSWD: /usr/bin/waydroid shell ime disable app.mantispro.gamepad/.services.MainService
+neko ALL=NOPASSWD: /usr/bin/waydroid shell am force-stop app.mantispro.gamepad
+
+# switch arm
+neko ALL=NOPASSWD: /usr/bin/python3 main.py install libhoudini
+neko ALL=NOPASSWD: /usr/bin/python3 main.py install libndk
+neko ALL=NOPASSWD: /usr/bin/python3 main.py remove libndk
+neko ALL=NOPASSWD: /usr/bin/python3 main.py remove libhoudini
+
+# disable usb-debug for some games
+neko ALL=NOPASSWD: /usr/bin/waydroid shell settings put global adb_enabled 0
+neko ALL=NOPASSWD: /usr/bin/waydroid shell settings put global adb_enabled 1
+
+# enable/disable mouse force touch
+neko ALL=NOPASSWD: /usr/bin/waydroid shell settings put system force_mouse_as_touch 1
+neko ALL=NOPASSWD: /usr/bin/waydroid shell settings put system force_mouse_as_touch 0
