@@ -34,7 +34,7 @@ Also used [aosp_build](https://github.com/opengapps/aosp_build) for lineage 18.1
 3. Get waydroid vendor manifest
 
     ```bash
-    wget -O - https://raw.githubusercontent.com/waydroid/android_vendor_waydroid/lineage-20.0/manifest_scripts/generate-manifest.sh | bash
+    wget -O - https://raw.githubusercontent.com/waydroid/android_vendor_waydroid/lineage-20/manifest_scripts/generate-manifest.sh | bash
     ```
 
 4. Mindthegapps part 1
