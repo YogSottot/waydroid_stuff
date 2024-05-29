@@ -1,0 +1,25 @@
+From a09dd7ff14a80109e41b7c277fbe25fa56cb5914 Mon Sep 17 00:00:00 2001
+From: YogSottot <7411302+YogSottot@users.noreply.github.com>
+Date: Tue, 28 May 2024 19:12:41 +0300
+Subject: [PATCH] patch: 30 - Enable xmlconfig on Android - 02
+
+---
+ BoardConfig.mk | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/BoardConfig.mk b/BoardConfig.mk
+index 0464654..f609e01 100644
+--- a/BoardConfig.mk
++++ b/BoardConfig.mk
+@@ -40,7 +40,7 @@ TARGET_NO_BOOTLOADER := true
+ TARGET_USES_HWC2 := true
+ ifneq ($(TARGET_USE_MESA),false)
+ BOARD_MESA3D_USES_MESON_BUILD := true
+-BOARD_MESA3D_MESON_ARGS := -Dallow-kcmp=enabled -Dintel-xe-kmd=enabled
++BOARD_MESA3D_MESON_ARGS := -Dallow-kcmp=enabled -Dintel-xe-kmd=enabled -Dxmlconfig=enabled
+ BOARD_MESA3D_BUILD_LIBGBM := true
+ BOARD_MESA3D_GALLIUM_DRIVERS := kmsro r300 r600 nouveau freedreno swrast v3d vc4 etnaviv tegra svga virgl panfrost lima radeonsi
+ BOARD_MESA3D_VULKAN_DRIVERS := broadcom freedreno panfrost swrast virtio amd
+-- 
+2.36.6
+

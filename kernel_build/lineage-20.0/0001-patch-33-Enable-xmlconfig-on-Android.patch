@@ -1,0 +1,81 @@
+From 677c25622e372a4eb3ca92e0c5399f75bfde8a08 Mon Sep 17 00:00:00 2001
+From: YogSottot <7411302+YogSottot@users.noreply.github.com>
+Date: Tue, 28 May 2024 17:19:06 +0300
+Subject: [PATCH] patch-33: Enable xmlconfig on Android
+
+---
+ android/Android.mk   |  4 ++--
+ meson.build          |  6 +++---
+ src/util/xmlconfig.c | 15 +++++++++++++++
+ 3 files changed, 20 insertions(+), 5 deletions(-)
+
+diff --git a/android/Android.mk b/android/Android.mk
+index 377aeb3a791..eb5039e3f82 100644
+--- a/android/Android.mk
++++ b/android/Android.mk
+@@ -39,10 +39,10 @@ MESA_VK_LIB_SUFFIX_swrast := lvp
+ 
+ include $(CLEAR_VARS)
+ 
+-LOCAL_SHARED_LIBRARIES := libc libdl libdrm libm liblog libcutils libz libc++ libnativewindow libsync libhardware
++LOCAL_SHARED_LIBRARIES := libc libdl libdrm libm liblog libcutils libz libc++ libnativewindow libsync libhardware libxml2
+ LOCAL_STATIC_LIBRARIES := libexpat libarect libelf
+ LOCAL_HEADER_LIBRARIES := libnativebase_headers hwvulkan_headers
+-MESON_GEN_PKGCONFIGS := cutils expat hardware libdrm:$(LIBDRM_VERSION) nativewindow sync zlib:1.2.11 libelf
++MESON_GEN_PKGCONFIGS := cutils expat hardware libdrm:$(LIBDRM_VERSION) nativewindow sync zlib:1.2.11 libelf libxml2
+ LOCAL_CFLAGS += $(BOARD_MESA3D_CFLAGS)
+ 
+ ifneq ($(filter swrast,$(BOARD_MESA3D_GALLIUM_DRIVERS) $(BOARD_MESA3D_VULKAN_DRIVERS)),)
+diff --git a/meson.build b/meson.build
+index 8963b314256..792c1b9f470 100644
+--- a/meson.build
++++ b/meson.build
+@@ -1573,7 +1573,7 @@ if dep_thread.found()
+ endif
+ 
+ with_expat = get_option('expat') \
+-  .disable_auto_if(with_platform_android or with_platform_windows)
++  .disable_auto_if(with_platform_windows)
+ 
+ if host_machine.system() == 'darwin'
+   dep_expat = meson.get_compiler('c').find_library('expat', required : with_expat)
+@@ -1589,8 +1589,8 @@ endif
+ 
+ # We don't require expat on Android or Windows
+ use_xmlconfig = get_option('xmlconfig') \
+-  .require(not (with_platform_android or with_platform_windows),
+-           error_message : 'xmlconfig not available on Android or Windows') \
++  .require(not (with_platform_windows),
++           error_message : 'xmlconfig not available on Windows') \
+   .require(dep_expat.found(),
+            error_message : 'requires expat') \
+   .allowed()
+diff --git a/src/util/xmlconfig.c b/src/util/xmlconfig.c
+index 8269f022940..f6e1e7ad61b 100644
+--- a/src/util/xmlconfig.c
++++ b/src/util/xmlconfig.c
+@@ -1165,6 +1165,21 @@ initOptionCache(driOptionCache *cache, const driOptionCache *info)
+    }
+ }
+ 
++#ifdef __ANDROID__
++#define SYSCONFDIR "/vendor/etc"
++#define DATADIR "/data/vendor"
++#else
++
++#ifndef SYSCONFDIR
++#define SYSCONFDIR "/etc"
++#endif
++
++#ifndef DATADIR
++#define DATADIR "/usr/share"
++#endif
++
++#endif /* __ANDROID__ */
++
+ static const char *execname;
+ 
+ void
+-- 
+2.36.6
+

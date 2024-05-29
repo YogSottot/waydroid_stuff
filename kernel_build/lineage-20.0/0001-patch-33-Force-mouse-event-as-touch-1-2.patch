@@ -1,0 +1,228 @@
+From 8093ba1996933acf93a674ff316f48f66d03ba74 Mon Sep 17 00:00:00 2001
+From: YogSottot <7411302+YogSottot@users.noreply.github.com>
+Date: Wed, 29 May 2024 20:37:59 +0300
+Subject: [PATCH] patch-33: Force mouse event as touch [1/2]
+
+Change-Id: I6e178a3d1932b3afe50e49d6835b915db115d21b
+---
+ core/java/android/provider/Settings.java      |  7 +++++
+ .../server/input/InputManagerService.java     | 31 +++++++++++++++++++
+ .../input/NativeInputManagerService.java      |  5 +++
+ ...droid_server_input_InputManagerService.cpp | 27 ++++++++++++++++
+ 4 files changed, 70 insertions(+)
+
+diff --git a/core/java/android/provider/Settings.java b/core/java/android/provider/Settings.java
+index 4578eecd7d45..aee5b4cf6e3e 100644
+--- a/core/java/android/provider/Settings.java
++++ b/core/java/android/provider/Settings.java
+@@ -5493,6 +5493,11 @@ public final class Settings {
+         @Readable
+         public static final String EGG_MODE = "egg_mode";
+ 
++        /**
++         * @hide
++         */
++        public static final String FORCE_MOUSE_AS_TOUCH = "force_mouse_as_touch";
++
+         /**
+          * Setting to determine whether or not to show the battery percentage in the status bar.
+          *    0 - Don't show percentage
+@@ -5660,6 +5665,7 @@ public final class Settings {
+             PRIVATE_SETTINGS.add(DISPLAY_COLOR_MODE);
+             PRIVATE_SETTINGS.add(DISPLAY_COLOR_MODE_VENDOR_HINT);
+             PRIVATE_SETTINGS.add(DESKTOP_MODE);
++            PRIVATE_SETTINGS.add(FORCE_MOUSE_AS_TOUCH);
+         }
+ 
+         /**
+@@ -5674,6 +5680,7 @@ public final class Settings {
+             CLONE_TO_MANAGED_PROFILE.add(SOUND_EFFECTS_ENABLED);
+             CLONE_TO_MANAGED_PROFILE.add(TEXT_SHOW_PASSWORD);
+             CLONE_TO_MANAGED_PROFILE.add(TIME_12_24);
++            CLONE_TO_MANAGED_PROFILE.add(FORCE_MOUSE_AS_TOUCH);
+         }
+ 
+         /** @hide */
+diff --git a/services/core/java/com/android/server/input/InputManagerService.java b/services/core/java/com/android/server/input/InputManagerService.java
+index f37a7f9e99cd..ca432e425288 100644
+--- a/services/core/java/com/android/server/input/InputManagerService.java
++++ b/services/core/java/com/android/server/input/InputManagerService.java
+@@ -490,6 +490,7 @@ public class InputManagerService extends IInputManager.Stub
+         Watchdog.getInstance().addMonitor(this);
+ 
+         registerPointerSpeedSettingObserver();
++        registerForceMouseAsTouchSettingObserver();
+         registerShowTouchesSettingObserver();
+         registerAccessibilityLargePointerSettingObserver();
+         registerLongPressTimeoutObserver();
+@@ -501,6 +502,7 @@ public class InputManagerService extends IInputManager.Stub
+             @Override
+             public void onReceive(Context context, Intent intent) {
+                 updatePointerSpeedFromSettings();
++                updateForceMouseAsTouchFromSettings();
+                 updateShowTouchesFromSettings();
+                 updateAccessibilityLargePointerFromSettings();
+                 updateDeepPressStatusFromSettings("user switched");
+@@ -509,6 +511,7 @@ public class InputManagerService extends IInputManager.Stub
+         }, new IntentFilter(Intent.ACTION_USER_SWITCHED), null, mHandler);
+ 
+         updatePointerSpeedFromSettings();
++        updateForceMouseAsTouchFromSettings();
+         updateShowTouchesFromSettings();
+         updateAccessibilityLargePointerFromSettings();
+         updateDeepPressStatusFromSettings("just booted");
+@@ -1860,6 +1863,14 @@ public class InputManagerService extends IInputManager.Stub
+                 properties -> properties.pointerIconVisible = visible);
+     }
+ 
++    private void updateForceMouseAsTouchFromSettings() {
++        boolean forceMouseAsTouch = getForceMouseAsTouchSetting();
++        setForceMouseAsTouchUnchecked(forceMouseAsTouch);
++    }
++    private void setForceMouseAsTouchUnchecked(boolean forceMouseAsTouch) {
++        mNative.setForceMouseAsTouch(forceMouseAsTouch);
++    }
++
+     private void registerPointerSpeedSettingObserver() {
+         mContext.getContentResolver().registerContentObserver(
+                 Settings.System.getUriFor(Settings.System.POINTER_SPEED), true,
+@@ -1881,6 +1892,26 @@ public class InputManagerService extends IInputManager.Stub
+         return speed;
+     }
+ 
++    private void registerForceMouseAsTouchSettingObserver() {
++        mContext.getContentResolver().registerContentObserver(
++                Settings.System.getUriFor(Settings.System.FORCE_MOUSE_AS_TOUCH), true,
++                new ContentObserver(mHandler) {
++                    @Override
++                    public void onChange(boolean selfChange) {
++                        updateForceMouseAsTouchFromSettings();
++                    }
++                }, UserHandle.USER_ALL);
++    }
++    private boolean getForceMouseAsTouchSetting() {
++        boolean forceMouseAsTouch = false;
++        try {
++            forceMouseAsTouch = Settings.System.getIntForUser(mContext.getContentResolver(),
++                    Settings.System.FORCE_MOUSE_AS_TOUCH, UserHandle.USER_CURRENT) > 0;
++        } catch (SettingNotFoundException ignored) {
++        }
++        return forceMouseAsTouch;
++    }
++
+     private void updateShowTouchesFromSettings() {
+         int setting = getShowTouchesSetting(0);
+         mNative.setShowTouches(setting != 0);
+diff --git a/services/core/java/com/android/server/input/NativeInputManagerService.java b/services/core/java/com/android/server/input/NativeInputManagerService.java
+index 32b2940b8111..4a66a6e78ed0 100644
+--- a/services/core/java/com/android/server/input/NativeInputManagerService.java
++++ b/services/core/java/com/android/server/input/NativeInputManagerService.java
+@@ -111,6 +111,8 @@ public interface NativeInputManagerService {
+ 
+     void setPointerAcceleration(float acceleration);
+ 
++    void setForceMouseAsTouch(boolean forceMouseAsTouch);
++
+     void setShowTouches(boolean enabled);
+ 
+     void setVolumeKeysRotation(int mode);
+@@ -291,6 +293,9 @@ public interface NativeInputManagerService {
+         @Override
+         public native void setPointerAcceleration(float acceleration);
+ 
++        @Override
++        public native void setForceMouseAsTouch(boolean forceMouseAsTouch);
++
+         @Override
+         public native void setShowTouches(boolean enabled);
+ 
+diff --git a/services/core/jni/com_android_server_input_InputManagerService.cpp b/services/core/jni/com_android_server_input_InputManagerService.cpp
+index c051a120a4bb..d694ea29a9bc 100644
+--- a/services/core/jni/com_android_server_input_InputManagerService.cpp
++++ b/services/core/jni/com_android_server_input_InputManagerService.cpp
+@@ -279,6 +279,7 @@ public:
+     void setPointerDisplayId(int32_t displayId);
+     void setPointerSpeed(int32_t speed);
+     void setPointerAcceleration(float acceleration);
++    void setForceMouseAsTouch(bool forceMouseAsTouch);
+     void setInputDeviceEnabled(uint32_t deviceId, bool enabled);
+     void setShowTouches(bool enabled);
+     void setVolumeKeysRotation(int mode);
+@@ -367,6 +368,9 @@ private:
+         // Pointer acceleration.
+         float pointerAcceleration;
+ 
++        // Force mouse events to be handled as touch event.
++        bool forceMouseAsTouch;
++
+         // True if pointer gestures are enabled.
+         bool pointerGesturesEnabled;
+ 
+@@ -419,6 +423,7 @@ NativeInputManager::NativeInputManager(jobject contextObj,
+         mLocked.systemUiLightsOut = false;
+         mLocked.pointerSpeed = 0;
+         mLocked.pointerAcceleration = android::os::IInputConstants::DEFAULT_POINTER_ACCELERATION;
++        mLocked.forceMouseAsTouch = false;
+         mLocked.pointerGesturesEnabled = true;
+         mLocked.showTouches = false;
+         mLocked.pointerDisplayId = ADISPLAY_ID_DEFAULT;
+@@ -448,6 +453,7 @@ void NativeInputManager::dump(std::string& dump) {
+                              toString(mLocked.systemUiLightsOut));
+         dump += StringPrintf(INDENT "Pointer Speed: %" PRId32 "\n", mLocked.pointerSpeed);
+         dump += StringPrintf(INDENT "Pointer Acceleration: %0.3f\n", mLocked.pointerAcceleration);
++        dump += StringPrintf(INDENT "Force Mouse As Touch: %s\n", toString(mLocked.forceMouseAsTouch));
+         dump += StringPrintf(INDENT "Pointer Gestures Enabled: %s\n",
+                 toString(mLocked.pointerGesturesEnabled));
+         dump += StringPrintf(INDENT "Show Touches: %s\n", toString(mLocked.showTouches));
+@@ -634,6 +640,7 @@ void NativeInputManager::getReaderConfiguration(InputReaderConfiguration* outCon
+         outConfig->pointerVelocityControlParameters.scale = exp2f(mLocked.pointerSpeed
+                 * POINTER_SPEED_EXPONENT);
+         outConfig->pointerVelocityControlParameters.acceleration = mLocked.pointerAcceleration;
++        outConfig->forceMouseAsTouch = mLocked.forceMouseAsTouch;
+         outConfig->pointerGesturesEnabled = mLocked.pointerGesturesEnabled;
+ 
+         outConfig->showTouches = mLocked.showTouches;
+@@ -1077,6 +1084,19 @@ void NativeInputManager::setPointerAcceleration(float acceleration) {
+             InputReaderConfiguration::CHANGE_POINTER_SPEED);
+ }
+ 
++void NativeInputManager::setForceMouseAsTouch(bool forceMouseAsTouch) {
++    { // acquire lock
++        AutoMutex _l(mLock);
++        if (mLocked.forceMouseAsTouch == forceMouseAsTouch) {
++            return;
++        }
++        ALOGI("Setting force mouse as touch to %s.", toString(forceMouseAsTouch));
++        mLocked.forceMouseAsTouch = forceMouseAsTouch;
++    } // release lock
++    mInputManager->getReader().requestRefreshConfiguration(
++        InputReaderConfiguration::CHANGE_FORCE_MOUSE_AS_TOUCH);
++}
++
+ void NativeInputManager::setInputDeviceEnabled(uint32_t deviceId, bool enabled) {
+     { // acquire lock
+         AutoMutex _l(mLock);
+@@ -1890,6 +1910,12 @@ static void nativeSetPointerAcceleration(JNIEnv* env, jobject nativeImplObj, jfl
+     im->setPointerAcceleration(acceleration);
+ }
+ 
++static void nativeSetForceMouseAsTouch(JNIEnv* env, jobject nativeImplObj, jboolean forceMouseAsTouch) {
++    NativeInputManager* im = getNativeInputManager(env, nativeImplObj);
++
++    im->setForceMouseAsTouch(forceMouseAsTouch);
++}
++
+ static void nativeSetShowTouches(JNIEnv* env, jobject nativeImplObj, jboolean enabled) {
+     NativeInputManager* im = getNativeInputManager(env, nativeImplObj);
+ 
+@@ -2374,6 +2400,7 @@ static const JNINativeMethod gInputManagerMethods[] = {
+         {"transferTouch", "(Landroid/os/IBinder;I)Z", (void*)nativeTransferTouch},
+         {"setPointerSpeed", "(I)V", (void*)nativeSetPointerSpeed},
+         {"setPointerAcceleration", "(F)V", (void*)nativeSetPointerAcceleration},
++        {"setForceMouseAsTouch", "(JZ)V", (void*)nativeSetForceMouseAsTouch},
+         {"setShowTouches", "(Z)V", (void*)nativeSetShowTouches},
+         {"setVolumeKeysRotation", "(I)V", (void*)nativeSetVolumeKeysRotation},
+         {"setInteractive", "(Z)V", (void*)nativeSetInteractive},
+-- 
+2.36.6
+
