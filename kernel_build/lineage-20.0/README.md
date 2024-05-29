@@ -193,10 +193,16 @@ Also used [aosp_build](https://github.com/opengapps/aosp_build) for lineage 18.1
 
 15. Use images
 
-    Make a backup beforehand
+    Make a backup of old images beforehand
 
     ```bash
     rsync -a /var/lib/waydroid /opt/waydroid_backups/
+    ```
+
+    If you updated from lineage-18.1, then make a backup of user-dir
+
+    ```bash
+    sudo rsync -a /home/user/.local/share/waydroid /home/user/.local/share/waydroid-18.1
     ```
 
     Your images are in current dir [lineage-20.0] (system.img / vendor.img)
