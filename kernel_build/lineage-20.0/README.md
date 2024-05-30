@@ -105,7 +105,7 @@ Also used [aosp_build](https://github.com/opengapps/aosp_build) for lineage 18.1
 
         ```bash
         curl https://raw.githubusercontent.com/YogSottot/waydroid_stuff/master/kernel_build/lineage-20.0/0001-patch-33-Enable-xmlconfig-on-Android.patch | git -C external/mesa/ apply -v --index
-        curl https://raw.githubusercontent.com/YogSottot/waydroid_stuff/master/kernel_build/lineage-18.1/0001-patch-30-Enable-xmlconfig-on-Android-02.patch | git -C external/mesa/ apply -v --index
+        curl https://raw.githubusercontent.com/YogSottot/waydroid_stuff/master/kernel_build/lineage-18.1/0001-patch-30-Enable-xmlconfig-on-Android-02.patch | git -C device/waydroid/waydroid/ apply -v --index
         ```
 
 9. Install docker

@@ -101,6 +101,12 @@ Also used [aosp_build](https://github.com/opengapps/aosp_build) for lineage 18.1
 
     If you don't need the patches, why are you building images? You can get official images via ```waydroid init -f -s GAPPS```.
 
+    * Enable squashfs images [[PR](https://github.com/waydroid/android_device_waydroid_waydroid/pull/2)]
+
+      ```bash
+      curl https://patch-diff.githubusercontent.com/raw/waydroid/android_device_waydroid_waydroid/pull/2.patch | git -C device/waydroid/waydroid/ apply -v --index
+      ```
+
     * Add force_mouse_as_touch option. [PR](https://github.com/waydroid/android_vendor_waydroid/pull/33)  
        If PR is already merged, this patch is no longer needed
 
@@ -114,7 +120,7 @@ Also used [aosp_build](https://github.com/opengapps/aosp_build) for lineage 18.1
 
         ```bash
         curl https://raw.githubusercontent.com/YogSottot/waydroid_stuff/master/kernel_build/lineage-18.1/0001-patch-30-Enable-xmlconfig-on-Android-01.patch | git -C external/mesa/ apply -v --index
-        curl https://raw.githubusercontent.com/YogSottot/waydroid_stuff/master/kernel_build/lineage-18.1/0001-patch-30-Enable-xmlconfig-on-Android-02.patch | git -C external/mesa/ apply -v --index
+        curl https://raw.githubusercontent.com/YogSottot/waydroid_stuff/master/kernel_build/lineage-18.1/0001-patch-30-Enable-xmlconfig-on-Android-02.patch | git -C device/waydroid/waydroid/ apply -v --index
         ```
 
 9. Install docker
