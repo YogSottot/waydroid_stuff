@@ -5,8 +5,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 SHELL ["bash", "-c"]
 
 RUN echo -e "USE_CCACHE=1" >> ~/.bashrc && \
-    echo -e "CCACHE_EXEC=/usr/bin/ccache" >> ~/.bashrc && \
-    echo -e "CCACHE_DIR=/mnt/lineage/.ccache" >> ~/.bashrc
+    echo -e "CCACHE_EXEC=/usr/bin/ccache" >> ~/.bashrc
 
 RUN sed -i 's/Types\:\ deb/Types\:\ deb\ deb-src/g' /etc/apt/sources.list.d/ubuntu.sources && \
     apt update && apt upgrade -y && \
@@ -124,11 +123,11 @@ EOF
 
 
 # Download and install latest clang
-#RUN curl -s https://apt.llvm.org/llvm.sh > /tmp/llvm.sh \
-#        && chmod a+x /tmp/llvm.sh \
-#        && /tmp/llvm.sh all \
-#        && export LLVM_VERSION=$(cat /tmp/llvm.sh | grep -oP 'CURRENT_LLVM_STABLE=(\K[0-9.]+)') \
-#        && for i in $(ls /usr/lib/llvm-$"LLVM_VERSION"/bin) ; do  ln -s /usr/lib/llvm-$"LLVM_VERSION"/bin/$"i" /usr/bin/$"i" ; done \
-#        && rm /tmp/llvm.sh
+RUN curl -s https://apt.llvm.org/llvm.sh > /tmp/llvm.sh \
+        && chmod a+x /tmp/llvm.sh \
+        && /tmp/llvm.sh all \
+        && export LLVM_VERSION=$(cat /tmp/llvm.sh | grep -oP 'CURRENT_LLVM_STABLE=(\K[0-9.]+)') \
+        && for i in $(ls /usr/lib/llvm-$"LLVM_VERSION"/bin) ; do  ln -s /usr/lib/llvm-$"LLVM_VERSION"/bin/$"i" /usr/bin/$"i" ; done \
+        && rm /tmp/llvm.sh
 
 CMD [ "bash", "-c" ]

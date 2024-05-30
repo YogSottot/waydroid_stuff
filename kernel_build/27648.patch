@@ -1,0 +1,138 @@
+From 735fe243a773cc3a13d0f4afedd0adb8f1bbd36f Mon Sep 17 00:00:00 2001
+From: Joshua Ashton <joshua@froggi.es>
+Date: Thu, 15 Feb 2024 23:00:46 +0000
+Subject: [PATCH] android: Use system = 'android' in crossfile
+
+Fixes the following libarchive error when building with the libarchive wrap subproject:
+
+In file included from ../subprojects/libarchive-3.7.2/libarchive/archive_write_open_memory.c:33:
+../subprojects/libarchive-3.7.2/libarchive/archive.h:101:10: fatal error: 'android_lf.h' file not found
+
+This also removes the version suffixes from the .so's that are referenced
+in the mesa3d_cross.mk file as those are not present on the Android target.
+
+Signed-off-by: Joshua Ashton <joshua@froggi.es>
+Part-of: <https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/27648>
+---
+ android/Android.mk      | 35 ++++++++++++++++-------------------
+ android/mesa3d_cross.mk | 12 ++++++------
+ 2 files changed, 22 insertions(+), 25 deletions(-)
+
+diff --git a/android/Android.mk b/android/Android.mk
+index 809be3af29f09..a6d3b4ac3f55b 100644
+--- a/android/Android.mk
++++ b/android/Android.mk
+@@ -128,23 +128,21 @@ endif
+ #-------------------------------------------------------------------------------
+ 
+ # $1: name
+-# $2: symlink suffix
+-# $3: subdir
+-# $4: source prebuilt
+-# $5: export headers
++# $2: subdir
++# $3: source prebuilt
++# $4: export headers
+ define mesa3d-lib
+ include $(CLEAR_VARS)
+ LOCAL_MODULE_CLASS := SHARED_LIBRARIES
+ LOCAL_MODULE := $1
+ LOCAL_VENDOR_MODULE := true
+-LOCAL_MODULE_RELATIVE_PATH := $3
+-LOCAL_PREBUILT_MODULE_FILE := $($4)
++LOCAL_MODULE_RELATIVE_PATH := $2
++LOCAL_PREBUILT_MODULE_FILE := $($3)
+ LOCAL_MULTILIB := first
+ LOCAL_CHECK_ELF_FILES := false
+ LOCAL_MODULE_SUFFIX := .so
+-LOCAL_MODULE_SYMLINKS := $1$2
+ LOCAL_SHARED_LIBRARIES := $(__MY_SHARED_LIBRARIES)
+-LOCAL_EXPORT_C_INCLUDE_DIRS := $5
++LOCAL_EXPORT_C_INCLUDE_DIRS := $4
+ include $(BUILD_PREBUILT)
+ 
+ ifdef TARGET_2ND_ARCH
+@@ -152,14 +150,13 @@ include $(CLEAR_VARS)
+ LOCAL_MODULE_CLASS := SHARED_LIBRARIES
+ LOCAL_MODULE := $1
+ LOCAL_VENDOR_MODULE := true
+-LOCAL_MODULE_RELATIVE_PATH := $3
+-LOCAL_PREBUILT_MODULE_FILE := $(2ND_$4)
++LOCAL_MODULE_RELATIVE_PATH := $2
++LOCAL_PREBUILT_MODULE_FILE := $(2ND_$3)
+ LOCAL_MULTILIB := 32
+ LOCAL_CHECK_ELF_FILES := false
+ LOCAL_MODULE_SUFFIX := .so
+-LOCAL_MODULE_SYMLINKS := $1$2
+ LOCAL_SHARED_LIBRARIES := $(__MY_SHARED_LIBRARIES)
+-LOCAL_EXPORT_C_INCLUDE_DIRS := $5
++LOCAL_EXPORT_C_INCLUDE_DIRS := $4
+ include $(BUILD_PREBUILT)
+ endif
+ endef
+@@ -167,25 +164,25 @@ endef
+ ifneq ($(strip $(BOARD_MESA3D_GALLIUM_DRIVERS)),)
+ # Module 'libgallium_dri', produces '/vendor/lib{64}/dri/libgallium_dri.so'
+ # This module also trigger DRI symlinks creation process
+-$(eval $(call mesa3d-lib,libgallium_dri,.so.0,dri,MESA3D_GALLIUM_DRI_BIN))
++$(eval $(call mesa3d-lib,libgallium_dri,dri,MESA3D_GALLIUM_DRI_BIN))
+ # Module 'libglapi', produces '/vendor/lib{64}/libglapi.so'
+-$(eval $(call mesa3d-lib,libglapi,.so.0,,MESA3D_LIBGLAPI_BIN))
++$(eval $(call mesa3d-lib,libglapi,,MESA3D_LIBGLAPI_BIN))
+ 
+ # Module 'libEGL_mesa', produces '/vendor/lib{64}/egl/libEGL_mesa.so'
+-$(eval $(call mesa3d-lib,libEGL_mesa,.so.1,egl,MESA3D_LIBEGL_BIN))
++$(eval $(call mesa3d-lib,libEGL_mesa,egl,MESA3D_LIBEGL_BIN))
+ # Module 'libGLESv1_CM_mesa', produces '/vendor/lib{64}/egl/libGLESv1_CM_mesa.so'
+-$(eval $(call mesa3d-lib,libGLESv1_CM_mesa,.so.1,egl,MESA3D_LIBGLESV1_BIN))
++$(eval $(call mesa3d-lib,libGLESv1_CM_mesa,egl,MESA3D_LIBGLESV1_BIN))
+ # Module 'libGLESv2_mesa', produces '/vendor/lib{64}/egl/libGLESv2_mesa.so'
+-$(eval $(call mesa3d-lib,libGLESv2_mesa,.so.2,egl,MESA3D_LIBGLESV2_BIN))
++$(eval $(call mesa3d-lib,libGLESv2_mesa,egl,MESA3D_LIBGLESV2_BIN))
+ endif
+ 
+ # Modules 'vulkan.{driver_name}', produces '/vendor/lib{64}/hw/vulkan.{driver_name}.so' HAL
+ $(foreach driver,$(BOARD_MESA3D_VULKAN_DRIVERS), \
+-    $(eval $(call mesa3d-lib,vulkan.$(MESA_VK_LIB_SUFFIX_$(driver)),.so.0,hw,MESA3D_VULKAN_$(driver)_BIN)))
++    $(eval $(call mesa3d-lib,vulkan.$(MESA_VK_LIB_SUFFIX_$(driver)),hw,MESA3D_VULKAN_$(driver)_BIN)))
+ 
+ ifneq ($(filter true, $(BOARD_MESA3D_BUILD_LIBGBM)),)
+ # Modules 'libgbm', produces '/vendor/lib{64}/libgbm.so'
+-$(eval $(call mesa3d-lib,$(MESA_LIBGBM_NAME),.so.1,,MESA3D_LIBGBM_BIN,$(MESA3D_TOP)/src/gbm/main))
++$(eval $(call mesa3d-lib,$(MESA_LIBGBM_NAME),,MESA3D_LIBGBM_BIN,$(MESA3D_TOP)/src/gbm/main))
+ endif
+ 
+ #-------------------------------------------------------------------------------
+diff --git a/android/mesa3d_cross.mk b/android/mesa3d_cross.mk
+index ca73e49d405bc..680788709843a 100644
+--- a/android/mesa3d_cross.mk
++++ b/android/mesa3d_cross.mk
+@@ -65,11 +65,11 @@ MESON_GEN_FILES_TARGET                   := $(MESON_GEN_DIR)/.timestamp
+ 
+ MESA3D_GALLIUM_DRI_DIR                   := $(MESON_OUT_DIR)/install/usr/local/lib/dri
+ $(M_TARGET_PREFIX)MESA3D_GALLIUM_DRI_BIN := $(MESON_OUT_DIR)/install/usr/local/lib/libgallium_dri.so
+-$(M_TARGET_PREFIX)MESA3D_LIBEGL_BIN      := $(MESON_OUT_DIR)/install/usr/local/lib/libEGL.so.1.0.0
+-$(M_TARGET_PREFIX)MESA3D_LIBGLESV1_BIN   := $(MESON_OUT_DIR)/install/usr/local/lib/libGLESv1_CM.so.1.1.0
+-$(M_TARGET_PREFIX)MESA3D_LIBGLESV2_BIN   := $(MESON_OUT_DIR)/install/usr/local/lib/libGLESv2.so.2.0.0
+-$(M_TARGET_PREFIX)MESA3D_LIBGLAPI_BIN    := $(MESON_OUT_DIR)/install/usr/local/lib/libglapi.so.0.0.0
+-$(M_TARGET_PREFIX)MESA3D_LIBGBM_BIN      := $(MESON_OUT_DIR)/install/usr/local/lib/$(MESA_LIBGBM_NAME).so.1.0.0
++$(M_TARGET_PREFIX)MESA3D_LIBEGL_BIN      := $(MESON_OUT_DIR)/install/usr/local/lib/libEGL.so
++$(M_TARGET_PREFIX)MESA3D_LIBGLESV1_BIN   := $(MESON_OUT_DIR)/install/usr/local/lib/libGLESv1_CM.so
++$(M_TARGET_PREFIX)MESA3D_LIBGLESV2_BIN   := $(MESON_OUT_DIR)/install/usr/local/lib/libGLESv2.so
++$(M_TARGET_PREFIX)MESA3D_LIBGLAPI_BIN    := $(MESON_OUT_DIR)/install/usr/local/lib/libglapi.so
++$(M_TARGET_PREFIX)MESA3D_LIBGBM_BIN      := $(MESON_OUT_DIR)/install/usr/local/lib/$(MESA_LIBGBM_NAME).so
+ 
+ 
+ MESA3D_GLES_BINS := \
+@@ -256,7 +256,7 @@ $(MESON_GEN_FILES_TARGET): $(sort $(shell find -L $(MESA3D_TOP) -not -path '*/\.
+ 		"pkgconfig = ['env', 'PKG_CONFIG_LIBDIR=' + '$(call relative-to-absolute,$(MESON_GEN_DIR))', '/usr/bin/pkg-config']\n\n" \
+ 		"llvm-config = '/dev/null'\n"                                                                                     \
+ 		"[host_machine]\n"                                                                                                \
+-		"system = 'linux'\n"                                                                                              \
++		"system = 'android'\n"                                                                                              \
+ 		"cpu_family = '$(MESON_CPU_FAMILY)'\n"                                                                            \
+ 		"cpu = '$(MESON_CPU_FAMILY)'\n"                                                                                   \
+ 		"endian = 'little'" > $(dir $@)/aosp_cross
+-- 
+GitLab
+
