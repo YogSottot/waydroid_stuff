@@ -92,7 +92,13 @@ Also used [aosp_build](https://github.com/opengapps/aosp_build) for lineage 18.1
 
 8. Apply custom patches
 
-    * Add force_mouse_as_touch option. [PR](https://github.com/waydroid/android_vendor_waydroid/pull/33)  
+    * **Only x86_64**: BoardConfig: Reland scudo native allocator for x86 devices [[PR](https://github.com/waydroid/android_device_waydroid_waydroid/pull/4)]
+
+      ```bash
+      curl https://patch-diff.githubusercontent.com/raw/waydroid/android_device_waydroid_waydroid/pull/4.patch | git -C device/waydroid/waydroid/ apply -v --index
+      ```
+
+    * **[Don't use the patch is broken on lineage-20!]** Add force_mouse_as_touch option. [PR](https://github.com/waydroid/android_vendor_waydroid/pull/33)  
        If PR is already merged, this patch is no longer needed
 
         ```bash
@@ -105,7 +111,7 @@ Also used [aosp_build](https://github.com/opengapps/aosp_build) for lineage 18.1
 
         ```bash
         curl https://raw.githubusercontent.com/YogSottot/waydroid_stuff/master/kernel_build/lineage-20.0/0001-patch-33-Enable-xmlconfig-on-Android.patch | git -C external/mesa/ apply -v --index
-        curl https://raw.githubusercontent.com/YogSottot/waydroid_stuff/master/kernel_build/lineage-18.1/0001-patch-30-Enable-xmlconfig-on-Android-02.patch | git -C device/waydroid/waydroid/ apply -v --index
+        curl https://raw.githubusercontent.com/YogSottot/waydroid_stuff/master/kernel_build/lineage-18.1/0001-patch-30-Enable-xmlconfig-on-Android-02.patch | git -C device/waydroid/waydroid/ apply -v
         ```
 
 9. Install docker

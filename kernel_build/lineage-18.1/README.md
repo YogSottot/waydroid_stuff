@@ -107,6 +107,14 @@ Also used [aosp_build](https://github.com/opengapps/aosp_build) for lineage 18.1
       curl https://patch-diff.githubusercontent.com/raw/waydroid/android_device_waydroid_waydroid/pull/2.patch | git -C device/waydroid/waydroid/ apply -v --index
       ```
 
+    * **Only x86_64**: BoardConfig: Reland scudo native allocator for x86 devices [[PR](https://github.com/waydroid/android_device_waydroid_waydroid/pull/4)]
+
+      ```bash
+      sed -i 's/MALLOC_SVELTE\ \:\=\ true//g' device/waydroid/waydroid/BoardConfig.mk
+      # apply patch doesn't work because of the above patch
+      # curl https://patch-diff.githubusercontent.com/raw/waydroid/android_device_waydroid_waydroid/pull/4.patch | git -C device/waydroid/waydroid/ apply -v --index
+      ```
+
     * Add force_mouse_as_touch option. [PR](https://github.com/waydroid/android_vendor_waydroid/pull/33)  
        If PR is already merged, this patch is no longer needed
 
@@ -120,7 +128,7 @@ Also used [aosp_build](https://github.com/opengapps/aosp_build) for lineage 18.1
 
         ```bash
         curl https://raw.githubusercontent.com/YogSottot/waydroid_stuff/master/kernel_build/lineage-18.1/0001-patch-30-Enable-xmlconfig-on-Android-01.patch | git -C external/mesa/ apply -v --index
-        curl https://raw.githubusercontent.com/YogSottot/waydroid_stuff/master/kernel_build/lineage-18.1/0001-patch-30-Enable-xmlconfig-on-Android-02.patch | git -C device/waydroid/waydroid/ apply -v --index
+        curl https://raw.githubusercontent.com/YogSottot/waydroid_stuff/master/kernel_build/lineage-18.1/0001-patch-30-Enable-xmlconfig-on-Android-02.patch | git -C device/waydroid/waydroid/ apply -v
         ```
 
 9. Install docker
@@ -225,6 +233,3 @@ Also used [aosp_build](https://github.com/opengapps/aosp_build) for lineage 18.1
     ```bash
     rsync *.img /var/lib/waydroid/images/
     ```
-
-    If you installed the arm translator for android 11, you need to uninstall it and install the version for 13.  
-    [casualsnek/waydroid_script](https://github.com/casualsnek/waydroid_script) can do that for you.
