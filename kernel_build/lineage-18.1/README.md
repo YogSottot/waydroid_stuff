@@ -81,6 +81,12 @@ Also used [aosp_build](https://github.com/opengapps/aosp_build) for lineage 18.1
     $(call inherit-product, vendor/opengapps/build/opengapps-packages.mk)
     ```
 
+    or
+
+    ```bash
+    curl https://raw.githubusercontent.com/YogSottot/waydroid_stuff/master/kernel_build/lineage-18.1/0001-Add-opengapps-in-device.mk.patch | git -C device/waydroid/waydroid/ apply -v --index
+    ```
+
     [Package Comparison](https://github.com/opengapps/opengapps/wiki/Package-Comparison)
 
     [fix opengapps build](https://github.com/opengapps/aosp_build/pull/222)
