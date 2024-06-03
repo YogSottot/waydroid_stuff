@@ -1,0 +1,24 @@
+From 3c0ee476cd41d5d7ea18d1f211099e5b2c07988e Mon Sep 17 00:00:00 2001
+From: YogSottot <7411302+YogSottot@users.noreply.github.com>
+Date: Mon, 3 Jun 2024 15:52:11 +0300
+Subject: [PATCH] Add opengapps in device.mk
+
+---
+ device.mk | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/device.mk b/device.mk
+index ae3899b..0b39e36 100644
+--- a/device.mk
++++ b/device.mk
+@@ -215,3 +215,7 @@ endif
+ # Updater
+ PRODUCT_PACKAGES += \
+     WaydroidUpdater
++
++# GAPPS
++GAPPS_VARIANT := pico
++$(call inherit-product, vendor/opengapps/build/opengapps-packages.mk)
+-- 
+2.36.6
+
