@@ -85,6 +85,7 @@ RUN sed -i 's/Types\:\ deb/Types\:\ deb\ deb-src/g' /etc/apt/sources.list.d/ubun
     x11proto-randr-dev \
     unzip \
     libreadline-dev \
+    android-sdk-libsparse-utils \
     meson && \
     apt build-dep -y mesa && \
     apt clean all && rm -rf /var/lib/apt/lists/*

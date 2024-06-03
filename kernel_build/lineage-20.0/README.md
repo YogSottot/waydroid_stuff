@@ -146,14 +146,14 @@ Also used [aosp_build](https://github.com/opengapps/aosp_build) for lineage 18.1
     If you want to use ccache, the create volume for it
 
     ```bash
-    mkdir /mnt/ccache
-    docker create -v /mnt/ccache:/ccache --name ccache waydroid-build-24.04
+    mkdir -p /mnt/ccache/lineage-20.0
+    docker create -v /mnt/ccache/lineage-20.0:/ccache --name ccache-20.0 waydroid-build-24.04
     ```
 
 12. Build system images
 
     ```bash
-    docker run -e CCACHE_DIR=/ccache --volumes-from ccache -v $(pwd):/mnt/lineage -it waydroid-build-24.04 bash -c 'cd /mnt/lineage && ccache -M 50G && . build/envsetup.sh && lunch lineage_waydroid_x86_64-userdebug && make systemimage -j$(nproc --all)' 
+    docker run -e CCACHE_DIR=/ccache --volumes-from ccache-20.0 -v $(pwd):/mnt/lineage -it waydroid-build-24.04 bash -c 'cd /mnt/lineage && ccache -M 50G && . build/envsetup.sh && lunch lineage_waydroid_x86_64-userdebug && make systemimage -j$(nproc --all)' 
     ```
 
     If you need ```waydroid-arm64```, change ```lineage_waydroid_x86_64-userdebug``` to ```lineage_waydroid_arm64-userdebug```.  
@@ -162,7 +162,7 @@ Also used [aosp_build](https://github.com/opengapps/aosp_build) for lineage 18.1
 13. Build vendor image
 
     ```bash
-    docker run -e CCACHE_DIR=/ccache --volumes-from ccache -v $(pwd):/mnt/lineage -it waydroid-build-24.04 bash -c 'cd /mnt/lineage && ccache -M 50G && . build/envsetup.sh && lunch lineage_waydroid_x86_64-userdebug && make vendorimage -j$(nproc --all)' 
+    docker run -e CCACHE_DIR=/ccache --volumes-from ccache-20.0 -v $(pwd):/mnt/lineage -it waydroid-build-24.04 bash -c 'cd /mnt/lineage && ccache -M 50G && . build/envsetup.sh && lunch lineage_waydroid_x86_64-userdebug && make vendorimage -j$(nproc --all)' 
     ```
 
       * If you get the error: ```/bin/bash: line 1: out/soong/.intermediates/prebuilts/build-tools/m4/linux_glibc_x86_64/m4: No such file or directory``` then do this:
@@ -172,12 +172,6 @@ Also used [aosp_build](https://github.com/opengapps/aosp_build) for lineage 18.1
         ln -sf ../../../../../../../prebuilts/build-tools/linux-x86/bin/m4 .
         cd ../../../../../../../
         ```
-
-      * If you get the error: ```meson.build:21:0: ERROR: Unknown options: "intel-xe-kmd"``` then do this:
-
-          ```bash
-          sed -i 's/-Dintel-xe-kmd=enabled//g' device/waydroid/waydroid/BoardConfig.mk
-          ```
 
       * If you get the error: ```../subprojects/libarchive-3.7.2/libarchive/archive.h:101:10: fatal error: 'android_lf.h' file not found``` then do this [[PR](https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/27648)]:
 
@@ -200,7 +194,7 @@ Also used [aosp_build](https://github.com/opengapps/aosp_build) for lineage 18.1
     Also you can create both images with a single command:
 
     ```bash
-    docker run -e CCACHE_DIR=/ccache --volumes-from ccache -v $(pwd):/mnt/lineage -it waydroid-build-24.04 bash -c 'cd /mnt/lineage && ccache -M 50G && . build/envsetup.sh && lunch lineage_waydroid_x86_64-userdebug && make systemimage -j$(nproc --all) && make vendorimage -j$(nproc --all)' 
+    docker run -e CCACHE_DIR=/ccache --volumes-from ccache-20.0 -v $(pwd):/mnt/lineage -it waydroid-build-24.04 bash -c 'cd /mnt/lineage && ccache -M 50G && . build/envsetup.sh && lunch lineage_waydroid_x86_64-userdebug && make systemimage -j$(nproc --all) && make vendorimage -j$(nproc --all)' 
     ```
 
 14. Convert images
@@ -208,6 +202,12 @@ Also used [aosp_build](https://github.com/opengapps/aosp_build) for lineage 18.1
     ```bash
     simg2img  out/target/product/waydroid_x86_64/system.img ./system.img
     simg2img  out/target/product/waydroid_x86_64/vendor.img ./vendor.img
+    ```
+
+    or
+
+    ```bash
+    docker run -v $(pwd):/mnt/lineage -it waydroid-build-24.04 bash -c 'cd /mnt/lineage && simg2img  out/target/product/waydroid_x86_64/system.img ./system.img && simg2img  out/target/product/waydroid_x86_64/vendor.img ./vendor.img'
     ```
 
 15. Use images
