@@ -29,6 +29,8 @@ It is needed because some applications run on only one of them.
 Some applications work on libhoudini but don't work on libndk (example: Crusaders Quest, Sdorica)  
 Some apps work on libndk but don't work on libhoudini (example: Tower of Fantasy, Mantis Gamepad Pro)  
 
+```libhoudini_patch.sh``` script for patching libhoidini. (Fix Blue Archive Global and Wuthering Waves) https://github.com/waydroid/waydroid/issues/788#issuecomment-2162386712
+
 ## Alternatives for  Mantis Gamepad  
 
 ### XTMapper
