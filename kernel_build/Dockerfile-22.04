@@ -80,8 +80,14 @@ RUN sed -i 's/\#\ deb-src/deb-src/g'  /etc/apt/sources.list && \
     x11proto-gl-dev \
     x11proto-randr-dev \
     unzip \
-    android-sdk-libsparse-utils \
-    meson && \
+    libclc-dev \
+    libglvnd-dev \
+    libglvnd-core-dev \
+    libvdpau-dev \
+    libomxil-bellagio-dev \
+    libva-dev \
+    android-sdk-libsparse-utils && \
+    pip3 install meson && \
     apt build-dep -y mesa && \
     apt clean all && rm -rf /var/lib/apt/lists/*
     
