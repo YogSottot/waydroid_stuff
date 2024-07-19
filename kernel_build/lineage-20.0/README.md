@@ -232,4 +232,4 @@ Also used [aosp_build](https://github.com/opengapps/aosp_build) for lineage 18.1
     ```
 
     If you installed the arm translator for android 11, you need to uninstall it and install the version for 13.  
-    [casualsnek/waydroid_script](https://github.com/casualsnek/waydroid_script) can do that for you.
+    [casualsnek/waydroid_script](https://github.com/casualsnek/waydroid_script) can do that for you. **arm-translator for lineage 20 is currently not working correctly.**
