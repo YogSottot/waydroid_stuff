@@ -205,14 +205,28 @@ Also used [aosp_build](https://github.com/opengapps/aosp_build) for lineage 18.1
         ```bash
         rm -f external/mesa/subprojects/libxml2.wrap
         ```
-
+      * If you get the error: ```java.lanjava.lang.OutOfMemoryError: Java heap spaceg.OutOfMemoryError: Java heap space``` then do this:
+        * Open file ```build/soong/java/droiddocdoc.go```
+        * Go to line 1476
+        * Add a new line with content ```Flag("-JXmx10g").```
+        * This is how that part should look like:
+        ```
+        cmd.BuiltTool(ctx, "metalava").
+		    Flag(config.JavacVmFlags).
+		    Flag("-JXmx10g").
+		    FlagWithArg("-encoding ", "UTF-8").
+		    FlagWithArg("-source ", javaVersion.String()).
+		    FlagWithRspFileInputList("@", srcs).
+		    FlagWithInput("@", srcJarList)
+        ```
+    
     Also you can create both images with a single command:
 
     ```bash
     docker run -e CCACHE_DIR=/ccache --volumes-from ccache-18.1 -v $(pwd):/mnt/lineage -it waydroid-build-24.04 bash -c 'cd /mnt/lineage && ccache -M 50G && . build/envsetup.sh && lunch lineage_waydroid_x86_64-userdebug && make systemimage -j$(nproc --all) && make vendorimage -j$(nproc --all)' 
     ```
 
-14. Convert images
+15. Convert images
 
     ```bash
     simg2img  out/target/product/waydroid_x86_64/system.img ./system.img
@@ -225,7 +239,7 @@ Also used [aosp_build](https://github.com/opengapps/aosp_build) for lineage 18.1
     docker run -v $(pwd):/mnt/lineage -it waydroid-build-24.04 bash -c 'cd /mnt/lineage && simg2img  out/target/product/waydroid_x86_64/system.img ./system.img && simg2img  out/target/product/waydroid_x86_64/vendor.img ./vendor.img'
     ```
 
-15. Use images
+16. Use images
 
     Make a backup beforehand
 
