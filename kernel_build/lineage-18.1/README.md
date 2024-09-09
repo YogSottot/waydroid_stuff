@@ -1,7 +1,7 @@
 # Build instructions
 
-**You need at least 250 Gb free space on ssd.**  
-**Zram is recommended if less 16 Gb RAM**
+**You need at least 250 GB free space, SSD is strongly recommended. If free space is low, BTRFS can be used for transparent compression.**  
+**ZRAM is recommended if less 16 GB RAM**
 
 ```bash
 apt install -y zram-tools
@@ -63,7 +63,7 @@ Also used [aosp_build](https://github.com/opengapps/aosp_build) for lineage 18.1
 
 5. Sync repos
 
-   About 200 gigabytes of data will be downloaded
+   About 130 gigabytes of data will be downloaded
 
     ```bash
     repo sync
