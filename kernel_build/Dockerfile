@@ -10,10 +10,10 @@ RUN echo -e "USE_CCACHE=1" >> ~/.bashrc && \
 RUN sed -i 's/Types\:\ deb/Types\:\ deb\ deb-src/g' /etc/apt/sources.list.d/ubuntu.sources && \
     apt update && apt upgrade -y && \
     apt -y install wget && \
-    wget http://archive.ubuntu.com/ubuntu/pool/universe/n/ncurses/libtinfo5_6.4-2ubuntu0.1_amd64.deb && \
-    apt install ./libtinfo5_6.4-2ubuntu0.1_amd64.deb -y && rm -f libtinfo5_6.4-2ubuntu0.1_amd64.deb && \
-    wget http://archive.ubuntu.com/ubuntu/pool/universe/n/ncurses/libncurses5_6.4-2ubuntu0.1_amd64.deb && \
-    apt install -y ./libncurses5_6.4-2ubuntu0.1_amd64.deb && rm -f libncurses5_6.4-2ubuntu0.1_amd64.deb && \
+    wget http://archive.ubuntu.com/ubuntu/pool/universe/n/ncurses/libtinfo5_6.3-2ubuntu0.1_amd64.deb && \
+    apt install ./libtinfo5_6.3-2ubuntu0.1_amd64.deb -y && rm -f libtinfo5_6.3-2ubuntu0.1_amd64.deb && \
+    wget http://archive.ubuntu.com/ubuntu/pool/universe/n/ncurses/libncurses5_6.3-2ubuntu0.1_amd64.deb && \
+    apt install -y ./libncurses5_6.3-2ubuntu0.1_amd64.deb && rm -f libncurses5_6.3-2ubuntu0.1_amd64.deb && \
     apt install -y \
     curl \
     build-essential \
