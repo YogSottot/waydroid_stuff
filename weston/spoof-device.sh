@@ -20,6 +20,7 @@ props=(
         "ro.odm.build.tags=release-keys"
         "ro.adb.secure = 1"
         "ro.debuggable = 0"
+        "ro.build.selinux = 1"
 )
 
 for i in "${props[@]}";
