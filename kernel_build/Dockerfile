@@ -31,6 +31,7 @@ RUN sed -i 's/Types\:\ deb/Types\:\ deb\ deb-src/g' /etc/apt/sources.list.d/ubun
     python3-packaging \
     python3-setuptools \
     python3-requests \
+    python3-pycparser \
     cmake \
     gcc \
     ninja-build \
