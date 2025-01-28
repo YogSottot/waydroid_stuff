@@ -8,10 +8,10 @@ Subject: [PATCH] Build squashfs images
  1 file changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/BoardConfig.mk b/BoardConfig.mk
-index f21f4bd..6bc4e9d 100644
+index e1b2cfe..7ca9c76 100644
 --- a/BoardConfig.mk
 +++ b/BoardConfig.mk
-@@ -61,8 +61,11 @@ TARGET_SYSTEM_PROP += $(DEVICE_PATH)/system.prop
+@@ -61,5 +61,8 @@ TARGET_SYSTEM_PROP += $(DEVICE_PATH)/system.prop
  TARGET_COPY_OUT_VENDOR := vendor
  BOARD_BUILD_SYSTEM_ROOT_IMAGE := true
  BOARD_SYSTEMIMAGE_PARTITION_SIZE := 3547483648
