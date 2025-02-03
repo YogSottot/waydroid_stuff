@@ -118,6 +118,7 @@ Also used [aosp_build](https://github.com/opengapps/aosp_build) for lineage 18.1
     [Documentation](https://docs.docker.com/desktop/install/linux-install/)  
 
     Of course you can build images without a docker. The [Dockerfile](../Dockerfile) has a list of required dependencies.
+    
 
 10. Copy Dockerfile
 
@@ -126,6 +127,8 @@ Also used [aosp_build](https://github.com/opengapps/aosp_build) for lineage 18.1
     ```
 
     Dockerfile [based on this](https://github.com/rabilrbl/kernel-build/)
+
+
 
 11. Build Docker imagekernel
 
@@ -157,7 +160,8 @@ Also used [aosp_build](https://github.com/opengapps/aosp_build) for lineage 18.1
     ```
 
     If you need ```waydroid-arm64```, change ```lineage_waydroid_x86_64-userdebug``` to ```lineage_waydroid_arm64-userdebug```.  
-    A full list of options is available at command ```lunch```.  
+    A full list of options is available at command ```lunch```.
+    NOTE: If your locale is tr_TR.UTF-8, set it to en_US.UTF-8 in /etc/locale.conf. Otherwise you will encounter compilation errors due to [Turkish I/İ problem](https://en.wikipedia.org/wiki/Dotted_and_dotless_I_in_computing).
 
 13. Build vendor image
 
