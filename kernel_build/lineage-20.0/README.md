@@ -92,6 +92,10 @@ Also used [aosp_build](https://github.com/opengapps/aosp_build) for lineage 18.1
 
 8. Apply custom patches
 
+   * Enable squashfs images
+     ```
+     curl https://raw.githubusercontent.com/YogSottot/waydroid_stuff/refs/heads/master/kernel_build/lineage-20.0/0001-Build-squashfs-images.patch | git -C device/waydroid/waydroid/ apply -v
+     ```
     * **[Don't use the patch is broken on lineage-20!]** Add force_mouse_as_touch option. [PR](https://github.com/waydroid/android_vendor_waydroid/pull/33)  
        If PR is already merged, this patch is no longer needed
 
@@ -108,13 +112,13 @@ Also used [aosp_build](https://github.com/opengapps/aosp_build) for lineage 18.1
         curl https://raw.githubusercontent.com/YogSottot/waydroid_stuff/master/kernel_build/lineage-18.1/0001-patch-30-Enable-xmlconfig-on-Android-02.patch | git -C device/waydroid/waydroid/ apply -v
         ```
 
-9. Install docker
+10. Install docker
     [Documentation](https://docs.docker.com/desktop/install/linux-install/)  
 
     Of course you can build images without a docker. The [Dockerfile](../Dockerfile) has a list of required dependencies.
     
 
-10. Copy Dockerfile
+11. Copy Dockerfile
 
     ```bash
     wget https://raw.githubusercontent.com/YogSottot/waydroid_stuff/master/kernel_build/Dockerfile
@@ -124,7 +128,7 @@ Also used [aosp_build](https://github.com/opengapps/aosp_build) for lineage 18.1
 
 
 
-11. Build Docker imagekernel
+12. Build Docker imagekernel
 
     ```bash
     docker build -t waydroid-build-24.04 .
@@ -147,7 +151,7 @@ Also used [aosp_build](https://github.com/opengapps/aosp_build) for lineage 18.1
     docker create -v /mnt/ccache/lineage-20.0:/ccache --name ccache-20.0 waydroid-build-24.04
     ```
 
-12. Build system images
+13. Build system images
 
     ```bash
     docker run -e CCACHE_DIR=/ccache --volumes-from ccache-20.0 -v $(pwd):/mnt/lineage -it waydroid-build-24.04 bash -c 'cd /mnt/lineage && ccache -M 50G && . build/envsetup.sh && lunch lineage_waydroid_x86_64-userdebug && make systemimage -j$(nproc --all)' 
@@ -157,7 +161,7 @@ Also used [aosp_build](https://github.com/opengapps/aosp_build) for lineage 18.1
     A full list of options is available at command ```lunch```.
     NOTE: If your locale is tr_TR.UTF-8, set it to en_US.UTF-8 in /etc/locale.conf. Otherwise you will encounter compilation errors due to [Turkish I/İ problem](https://en.wikipedia.org/wiki/Dotted_and_dotless_I_in_computing).
 
-13. Build vendor image
+14. Build vendor image
 
     ```bash
     docker run -e CCACHE_DIR=/ccache --volumes-from ccache-20.0 -v $(pwd):/mnt/lineage -it waydroid-build-24.04 bash -c 'cd /mnt/lineage && ccache -M 50G && . build/envsetup.sh && lunch lineage_waydroid_x86_64-userdebug && make vendorimage -j$(nproc --all)' 
@@ -195,7 +199,7 @@ Also used [aosp_build](https://github.com/opengapps/aosp_build) for lineage 18.1
     docker run -e CCACHE_DIR=/ccache --volumes-from ccache-20.0 -v $(pwd):/mnt/lineage -it waydroid-build-24.04 bash -c 'cd /mnt/lineage && ccache -M 50G && . build/envsetup.sh && lunch lineage_waydroid_x86_64-userdebug && make systemimage -j$(nproc --all) && make vendorimage -j$(nproc --all)' 
     ```
 
-14. Convert images
+15. Convert images
 
     ```bash
     simg2img  out/target/product/waydroid_x86_64/system.img ./system.img
@@ -208,7 +212,7 @@ Also used [aosp_build](https://github.com/opengapps/aosp_build) for lineage 18.1
     docker run -v $(pwd):/mnt/lineage -it waydroid-build-24.04 bash -c 'cd /mnt/lineage && simg2img  out/target/product/waydroid_x86_64/system.img ./system.img && simg2img  out/target/product/waydroid_x86_64/vendor.img ./vendor.img'
     ```
 
-15. Use images
+16. Use images
 
     Make a backup of old images beforehand
 
