@@ -1,0 +1,26 @@
+From b9e6cf76c86579ab6db0451297b3e3d18c8c9a02 Mon Sep 17 00:00:00 2001
+From: Alessandro Astone <ales.astone@gmail.com>
+Date: Mon, 23 Jan 2023 19:02:16 +0100
+Subject: [PATCH] Build squashfs images
+
+---
+ BoardConfig.mk | 5 ++++--
+ 1 file changed, 4 insertions(+), 2 deletion(-)
+
+diff --git a/BoardConfig.mk b/BoardConfig.mk
+index 43c243c..44cd176 100644
+--- a/BoardConfig.mk
++++ b/BoardConfig.mk
+@@ -60,8 +60,10 @@ TARGET_SYSTEM_PROP += $(DEVICE_PATH)/system.prop
+ # Partitions
+ TARGET_COPY_OUT_VENDOR := vendor
+ BOARD_BUILD_SYSTEM_ROOT_IMAGE := true
+-BOARD_SYSTEMIMAGE_FILE_SYSTEM_TYPE := ext4
+-BOARD_VENDORIMAGE_FILE_SYSTEM_TYPE := ext4
++BOARD_SYSTEMIMAGE_FILE_SYSTEM_TYPE := squashfs
++BOARD_SYSTEMIMAGE_SQUASHFS_COMPRESSOR := gzip
++BOARD_VENDORIMAGE_FILE_SYSTEM_TYPE := squashfs
++BOARD_VENDORIMAGE_SQUASHFS_COMPRESSOR := gzip
+ TARGET_USERIMAGES_SPARSE_EXT_DISABLED := true
+
+ # Offending entries:

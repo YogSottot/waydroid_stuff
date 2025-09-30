@@ -113,14 +113,6 @@ Also used [aosp_build](https://github.com/opengapps/aosp_build) for lineage 18.1
       curl https://raw.githubusercontent.com/YogSottot/waydroid_stuff/refs/heads/master/kernel_build/lineage-18.1/0001-Build-squashfs-images.patch | git -C device/waydroid/waydroid/ apply -v --index
       ```
 
-    * Add force_mouse_as_touch option. [PR](https://github.com/waydroid/android_vendor_waydroid/pull/33)  
-       If PR is already merged, this patch is no longer needed
-
-        ```bash
-        curl https://raw.githubusercontent.com/waydroid/android_vendor_waydroid/828afefb59ccce46e089756e95e15e6191e272f1/waydroid-patches/base-patches-30/frameworks/base/0051-Force-mouse-event-as-touch-1-2.patch | git -C frameworks/base/ apply -v --index
-        curl https://raw.githubusercontent.com/waydroid/android_vendor_waydroid/828afefb59ccce46e089756e95e15e6191e272f1/waydroid-patches/base-patches-30/frameworks/native/0015-Force-mouse-event-as-touch-2-2.patch | git -C frameworks/native/ apply -v --index
-        ```
-
     * Add xmlconfig [PR](https://github.com/waydroid/android_external_mesa3d/pull/8)  
         If PR is already merged, this patch is no longer needed
 
